@@ -4,9 +4,11 @@ import agents.ConsumerAgent;
 import jade.core.ProfileImpl;
 import jade.core.Runtime;
 import jade.gui.GuiEvent;
+import jade.lang.acl.ACLMessage;
 import jade.wrapper.AgentContainer;
 import jade.wrapper.AgentController;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -23,6 +25,7 @@ import javafx.stage.Stage;
 public class ConsumerContainer extends Application {
 	
 	protected ConsumerAgent consumerAgent;
+	ObservableList<String> observableList;
 	
 	public static void main(String[] args) throws Exception {
 		launch(args);
@@ -42,6 +45,7 @@ public class ConsumerContainer extends Application {
 	public void start(Stage primaryStage) throws Exception {
 		startContainer();
 		
+		primaryStage.setTitle("Cosumateur");
 		HBox xBox = new HBox();
 		xBox.setPadding(new Insets(10));
 		xBox.setSpacing(10);
@@ -51,7 +55,7 @@ public class ConsumerContainer extends Application {
 		xBox.getChildren().addAll(label, textFieldLivre, buttonAcheter);
 		
 		VBox vBox = new VBox(); vBox.setPadding(new Insets(10));
-		ObservableList<String> observableList = FXCollections.observableArrayList();
+		observableList = FXCollections.observableArrayList();
 		ListView<String> listViewMessage = new ListView<String>(observableList);
 		vBox.getChildren().add(listViewMessage);
 		
@@ -75,4 +79,9 @@ public class ConsumerContainer extends Application {
 		this.consumerAgent = consumerAgent;
 	}
 	
+	public void logMessage(ACLMessage aclMessage) {
+		Platform.runLater(() -> {
+			observableList.add(aclMessage.getContent());
+		});
+	}
 }

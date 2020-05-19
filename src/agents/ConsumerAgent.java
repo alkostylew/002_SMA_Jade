@@ -66,18 +66,7 @@ public class ConsumerAgent extends GuiAgent {
 			public void action() {
 				ACLMessage aclMessage = receive();
 				if (aclMessage != null) {
-					System.out.println("*********************************************");
-					System.out.println("Réception du message ");
-					System.out.println(aclMessage.getContent());
-					System.out.println(aclMessage.getSender().getName());
-					System.out.println(aclMessage.getPerformative());
-					System.out.println(aclMessage.getLanguage());
-					System.out.println(aclMessage.getOntology());
-					System.out.println("*********************************************");
-					
-					ACLMessage replay = aclMessage.createReply();
-					replay.setContent("Weekind libre oh non");
-					send(replay);
+					gui.logMessage(aclMessage);
 				} else {
 					block();
 				}
@@ -113,7 +102,7 @@ public class ConsumerAgent extends GuiAgent {
 			String livre = params.getParameter(0).toString();
 			ACLMessage aclMessage = new ACLMessage(ACLMessage.REQUEST);
 			aclMessage.setContent(livre);
-			aclMessage.addReceiver(new AID("rma", AID.ISLOCALNAME));
+			aclMessage.addReceiver(new AID("Acheteur", AID.ISLOCALNAME));
 			send(aclMessage);
 		}
 	}
