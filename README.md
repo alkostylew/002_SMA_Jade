@@ -2,4 +2,4 @@
 002_SMA_Jade - système multi-agents
 
 Eclipse Project
-Système Multi Agents
+Syst�me Multi Agents
