@@ -66,7 +66,14 @@ public class ConsumerAgent extends GuiAgent {
 			public void action() {
 				ACLMessage aclMessage = receive();
 				if (aclMessage != null) {
-					gui.logMessage(aclMessage);
+					switch (aclMessage.getPerformative()) {
+					case ACLMessage.CONFIRM:
+						gui.logMessage(aclMessage);
+						break;
+
+					default:
+						break;
+					}
 				} else {
 					block();
 				}

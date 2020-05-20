@@ -1,5 +1,8 @@
 package agents;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import containers.AcheteurContainer;
 import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;
@@ -29,7 +32,7 @@ public class AcheteurAgent extends GuiAgent {
 		ParallelBehaviour parallelBehaviour = new ParallelBehaviour();
 		addBehaviour(parallelBehaviour);
 		
-		parallelBehaviour.addSubBehaviour(new TickerBehaviour(this, 5000) {
+		parallelBehaviour.addSubBehaviour(new TickerBehaviour(this, 50000) {
 			@Override
 			protected void onTick() {
 				DFAgentDescription dfAgentDescription = new DFAgentDescription();
@@ -52,6 +55,8 @@ public class AcheteurAgent extends GuiAgent {
 		});
 		
 		parallelBehaviour.addSubBehaviour(new CyclicBehaviour() {
+			private int counter = 0; 
+			private List<ACLMessage> replies = new ArrayList<ACLMessage>();
 			@Override
 			public void action() {
 				MessageTemplate messageTemplate= 
@@ -75,10 +80,29 @@ public class AcheteurAgent extends GuiAgent {
 						send(aclMessage2);
 						break;
 					case ACLMessage.PROPOSE:
-						
+						++counter;
+						replies.add(aclMessage);
+						if (counter==vendeurs.length) {
+							ACLMessage meilleurOffre = replies.get(0); 
+							double mini = Double.parseDouble(meilleurOffre.getContent());
+							for (ACLMessage offre: replies) {
+								double price = Double.parseDouble(offre.getContent());
+								if (price<mini) {
+									meilleurOffre = offre;
+									mini = price;
+								}
+							}
+							
+							ACLMessage aclMessageAccept = meilleurOffre.createReply();
+							aclMessageAccept.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
+							send(aclMessageAccept);
+						}
 						break;
 					case ACLMessage.AGREE:
-						
+						ACLMessage aclMessage3 = new ACLMessage(ACLMessage.CONFIRM);
+						aclMessage3.addReceiver(new AID("Consumer", AID.ISLOCALNAME));
+						aclMessage3.setContent(aclMessage.getContent());
+						send(aclMessage3);
 						break;
 					case ACLMessage.REFUSE:
 						
@@ -90,7 +114,7 @@ public class AcheteurAgent extends GuiAgent {
 					String livre = aclMessage.getContent();
 					gui.logMessage(aclMessage);
 					ACLMessage reply = aclMessage.createReply();
-					reply.setContent("OK pour "+livre);
+					reply.setContent(livre);
 					send(reply);
 					ACLMessage aclMessage3 = new ACLMessage(ACLMessage.CFP);
 					aclMessage3.setContent(livre);

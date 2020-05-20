@@ -1,5 +1,7 @@
 package agents;
 
+import java.util.Random;
+
 import containers.VendeurContainer;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
@@ -49,6 +51,21 @@ public class VendeurAgent extends GuiAgent {
 				ACLMessage aclMessage = receive();
 				if (aclMessage != null) {
 					gui.logMessage(aclMessage);
+					switch (aclMessage.getPerformative()) {
+					case ACLMessage.CFP:
+						ACLMessage reply = aclMessage.createReply();
+						reply.setContent(String.valueOf(500 + new Random().nextInt(1000)));
+						reply.setPerformative(ACLMessage.PROPOSE);
+						send(reply);
+						break;
+					case ACLMessage.ACCEPT_PROPOSAL:
+						ACLMessage aclMessage2 = aclMessage.createReply();
+						aclMessage2.setPerformative(ACLMessage.AGREE);
+						send(aclMessage2);
+						break;
+					default:
+						break;
+					}
 				} else {
 					block();
 				}
